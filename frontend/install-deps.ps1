@@ -1,0 +1,1 @@
+& "E:\Nodejs\npm.cmd" install

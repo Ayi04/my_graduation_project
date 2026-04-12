@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check User Data</title>
+</head>
+<body>
+    <h1>User Data in Local Storage</h1>
+    <pre id="user-data"></pre>
+    
+    <script>
+        // 检查本地存储中的用户数据
+        const userData = localStorage.getItem('user');
+        const userDataElement = document.getElementById('user-data');
+        
+        if (userData) {
+            try {
+                const parsedData = JSON.parse(userData);
+                userDataElement.textContent = JSON.stringify(parsedData, null, 2);
+            } catch (error) {
+                userDataElement.textContent = 'Error parsing user data: ' + error.message;
+            }
+        } else {
+            userDataElement.textContent = 'No user data found in local storage';
+        }
+    </script>
+</body>
+</html>
