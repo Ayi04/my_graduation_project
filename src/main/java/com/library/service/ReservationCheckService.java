@@ -32,12 +32,22 @@ public class ReservationCheckService {
     @Scheduled(cron = "0 * * * * ?")
     public void checkOverdueReservations() {
         Date now = new Date();
-        // 查找所有待签到且超过开始时间15分钟的预约
+        // 查找所有待签到的预约
         List<Reservation> overdueReservations = reservationRepository.findByStatus(Reservation.ReservationStatus.CONFIRMED);
 
+        // 获取签到时间限制（从第一个区域获取，因为所有区域的设置都相同）
+        Integer checkinTimeLimit = 15; // 默认15分钟
+        List<Area> areas = areaRepository.findAll();
+        if (!areas.isEmpty()) {
+            Area area = areas.get(0);
+            if (area.getCheckinTimeLimit() != null) {
+                checkinTimeLimit = area.getCheckinTimeLimit();
+            }
+        }
+
         for (Reservation reservation : overdueReservations) {
-            // 检查是否超过开始时间15分钟
-            if (now.getTime() - reservation.getStartTime().getTime() > 15 * 60 * 1000) {
+            // 检查是否超过开始时间指定分钟数
+            if (now.getTime() - reservation.getStartTime().getTime() > checkinTimeLimit * 60 * 1000) {
                 // 取消预约
                 cancelOverdueReservation(reservation);
             }
