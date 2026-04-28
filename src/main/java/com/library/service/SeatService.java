@@ -157,8 +157,18 @@ public class SeatService {
         }
         
         Date now = new Date();
-        // 检查是否迟到（超过预约开始时间15分钟）
-        boolean isLate = now.getTime() - reservation.getStartTime().getTime() > 15 * 60 * 1000;
+        // 获取签到时间限制（从第一个区域获取，因为所有区域的设置都相同）
+        Integer checkinTimeLimit = 15; // 默认15分钟
+        List<Area> areas = areaRepository.findAll();
+        if (!areas.isEmpty()) {
+            Area area = areas.get(0);
+            if (area.getCheckinTimeLimit() != null) {
+                checkinTimeLimit = area.getCheckinTimeLimit();
+            }
+        }
+        
+        // 检查是否迟到（超过预约开始时间指定分钟数）
+        boolean isLate = now.getTime() - reservation.getStartTime().getTime() > checkinTimeLimit * 60 * 1000;
         
         // 更新预约信息
         reservation.setCheckInTime(now);
